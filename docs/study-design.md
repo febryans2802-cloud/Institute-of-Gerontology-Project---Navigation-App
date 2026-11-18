@@ -1,6 +1,6 @@
 # Study & System Design: Eyes-Free vs. Screen Navigation Guidance for Older Mobility-Cane Users
 
-Status: **Draft v0.1** — open decisions are marked **[DECISION]**.
+Status: **Draft v0.2**. Decisions resolved in v0.2 are marked **[DECIDED]**; the only open item is marked **[DECISION]**. The decision log is in §9.
 
 ---
 
@@ -28,19 +28,19 @@ Eyes-free pedestrian navigation (audio, vibrotactile) has been studied extensive
 | **S — Screen** | Held in the free (non-cane) hand | Large arrow + short text + landmark on screen | One generic short vibration when the instruction changes (no direction info) |
 | **AH — Audio + Haptic** | Fixed pouch/pocket (see §2.2) | Pre-recorded Mandarin voice prompt + direction-specific vibration pattern | Included in the prompt |
 
-### 2.1 Why the Screen condition gets a generic vibration — **[DECISION]**
+### 2.1 Why the Screen condition gets a generic vibration — **[DECIDED: yes]**
 Without any alert, Screen participants must watch the screen continuously, which makes the baseline artificially bad and the result trivially predictable. Giving both conditions the same *attention cue* means the conditions differ only in **which modality carries the direction information**. This is a cleaner contrast and matches how commercial apps behave (notification buzz).
 Alternative: pure visual (no vibration) baseline — easier to "win" against, harder to defend in review.
 
 ### 2.2 Phone haptics: known weakness and mitigations
 Phone vibration in a pocket is weaker and less distinct than a wrist-worn device, and vibrotactile sensitivity declines with age. Therefore in practice the AH condition will be **audio-dominant**; claims must be scoped to "audio + phone haptic".
 Mitigations:
-- **Fixed phone location** for all participants: a small chest/waist pouch on the non-cane side (trouser pockets vary too much by clothing). **[DECISION: pouch type]**
+- **Fixed phone location** for all participants: a small chest/waist pouch on the non-cane side (trouser pockets vary too much by clothing). **[DECIDED: waist pouch, non-cane side]**
 - **Few, maximally distinct patterns** (§5.4).
 - **Perception check** during familiarisation: participant must correctly identify ≥ 90 % of patterns *while walking*; otherwise note it and still run (report as covariate).
 - Smartwatch (Garmin Connect IQ) haptics → future work.
 
-### 2.3 Audio output — **[DECISION]**
+### 2.3 Audio output — **[DECIDED: bone-conduction headset]**
 Phone speaker inside a pouch + Tainan street noise = likely inaudible. Options:
 1. **Open-ear bone-conduction headset** (recommended: keeps traffic audible, no ear occlusion).
 2. Single earbud on the non-traffic side.
@@ -84,7 +84,7 @@ For a within-subject comparison with α = .05 and power = .80: d_z = 0.8 → n �
 ### Covariates to record
 Age, sex, education, cane type and years of use, fall history (12 months), smartphone experience, Timed Up and Go (TUG), hearing aid use, glasses type (**bifocal/progressive lenses** matter: looking down through them while walking is itself a fall risk), route familiarity.
 
-> Recruitment: community care centres (社區關懷據點), senior learning centres, NCKU Hospital outpatient departments. Coordinate with the Institute of Gerontology.
+> Recruitment: community care centres (社區關懷據點), senior learning centres, hospital outpatient departments. Coordinate with the Institute of Gerontology.
 
 ---
 
@@ -127,11 +127,11 @@ Plus: **Continue straight** reassurance (on long segments), **Arrived**, **Off-r
 ### 5.2 Wording rules
 - Landmark-based, not meter-based.
 - ≤ 8 Chinese characters before the key verb; key information (left/right) early.
-- Pre-recorded by one speaker at a slow rate (consistency across participants; avoids TTS variability). Taiwanese Hokkien version optional. **[DECISION]**
+- Pre-recorded by one speaker at a slow rate (consistency across participants; avoids TTS variability). Taiwanese Hokkien version optional. **[DECIDED: Mandarin only for the first study]**
 
 ### 5.3 Screen design (Condition S)
 - One instruction at a time; large arrow (≥ 40 % of screen height), text ≥ 24 pt, high contrast, landmark text below.
-- No map (a map invites prolonged looking and adds a confound). **[DECISION: no map vs. simple map]**
+- No map (a map invites prolonged looking and adds a confound). **[DECIDED: no map]**
 - Same content and same trigger timing as AH prompts.
 
 ### 5.4 Vibration patterns (Condition AH)
@@ -143,7 +143,11 @@ Kept to four, rhythmically distinct, each preceding the audio:
 | Turn right | 4 short: 100-100-100-100-100-100-100 |
 | Continue / reassurance | 1 short: 150 |
 | Arrived | 1 very long: 1000 |
+| Off-route / stop | 3 long: 400-200-400-200-400 |
 | Screen-condition generic cue | 1 short: 150 |
+| Sync marker | 1 long: 500 (plus a white screen flash) |
+
+In the AH condition the participant screen stays black and shows no direction information. If participants take the phone out and look, they must not get the Screen condition's information.
 
 Use the Android amplitude API at maximum amplitude where supported. Validate during piloting.
 
@@ -201,7 +205,7 @@ Use the Android amplitude API at maximum amplitude where supported. Validate dur
 - **Transport:** the wizard phone runs a mobile hotspot and a WebSocket server; the participant phone joins it. This works without mobile data, has low latency, and is reliable within the 3–8 m following distance. Fallback: auto-reconnect plus heartbeat every 1 s; the wizard UI shows connection status and the last ack.
 - **No GPS-based triggering** in the main study (Wizard-of-Oz). GPS is logged only, for trajectory plots and post-hoc checks.
 
-### 7.2 Framework — **[DECISION]**
+### 7.2 Framework — **[DECIDED: Flutter, Android]**
 Recommended: **Flutter (Android only)**. It has good support for WebSocket servers (`dart:io`), the vibration amplitude API, audio playback, and screen keep-awake. React Native is also viable if the team already knows it.
 
 ### 7.3 Route script (JSON)
@@ -209,7 +213,7 @@ Recommended: **Flutter (Android only)**. It has good support for WebSocket serve
 ```json
 {
   "route_id": "R1",
-  "name": "NCKU east gate → ...",
+  "name": "Route 1",
   "prompts": [
     {
       "id": "R1-P01-ADV",
@@ -228,7 +232,7 @@ Recommended: **Flutter (Android only)**. It has good support for WebSocket serve
 The wizard UI walks through `prompts` in order: a large **NEXT** button sends the next prompt, plus **REPEAT** and **OFF-ROUTE**.
 
 ### 7.4 Wizard observer buttons
-`stop_observed`, `wrong_turn`, `help_request`, `spotter_intervention`, `near_fall`, `signal_wait_start/end`, `free_note` (voice memo), with **undo** for the last event. All events are timestamped.
+`stop_observed`, `wrong_turn`, `help_request`, `spotter_intervention`, `near_fall`, `signal_wait_start/end`, `note` (typed), with **undo** for the last event. Undo writes an `observer_undo` event that refers to the retracted event; nothing is deleted. All events are timestamped.
 
 ### 7.5 Log schema (JSONL, one event per line, on each device)
 
@@ -278,17 +282,23 @@ Logs are stored locally and exported over USB/share sheet after the session. Use
 
 ---
 
-## 9. Open decisions (summary)
-1. Generic vibration cue in the Screen condition (recommended: yes) — §2.1
-2. Phone pouch type/location — §2.2
-3. Audio device: bone-conduction (recommended) / single earbud / speaker — §2.3
-4. MoCA-T cutoff — §3
-5. Hokkien prompts — §5.2
-6. Screen with or without a map (recommended: no map) — §5.3
-7. Flutter (recommended) vs. React Native — §7.2
-8. IMU: second phone + logger app vs. dedicated sensor — §7.1
+## 9. Decision log
 
----
+| # | Decision | Outcome | § |
+|---|---|---|---|
+| 1 | Generic vibration cue in the Screen condition | Yes | 2.1 |
+| 2 | Phone carrying position | Waist pouch, non-cane side | 2.2 |
+| 3 | Audio device | Open-ear bone-conduction headset | 2.3 |
+| 4 | MoCA-T cutoff | **Open: decide with advisor** | 3 |
+| 5 | Hokkien prompts | Mandarin only for the first study | 5.2 |
+| 6 | Map on screen | No map | 5.3 |
+| 7 | Framework | Flutter, Android only | 7.2 |
+| 8 | IMU | Second Android phone in a lower-back belt pouch running an off-the-shelf sensor-logger app. Switch to a dedicated IMU only if piloting shows phone sampling is irregular | 7.1 |
+| 9 | Haptics device | Phone, not smartwatch (smartwatch → future work) | 2.2 |
+| 10 | Prompt triggering | Wizard-of-Oz | 7.1 |
+
+### Delivery confirmation (added in v0.2)
+A successful network write does not prove that a prompt arrived; a half-closed connection accepts writes silently. The participant phone acknowledges every prompt (`received`, `rendered`, `finished`). If `received` does not arrive within 1.5 s, the wizard screen shows **NOT RECEIVED — press REPEAT** and logs `prompt_unacked`. In the logs, `transmitted` means "written to the socket". Only acks count as delivery.
 
 ## 10. Limitations to state up front
 - Phone haptics are weaker than wrist haptics → AH is audio-dominant.

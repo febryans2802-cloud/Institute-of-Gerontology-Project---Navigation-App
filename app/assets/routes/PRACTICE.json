@@ -1,0 +1,51 @@
+{
+  "route_id": "PRACTICE",
+  "name": "Practice route",
+  "template": false,
+  "_comment": "TEMPLATE: replace with the surveyed route. Prompts are played in order by the wizard's NEXT button.",
+  "prompts": [
+    {
+      "id": "PRACTICE-P01-ADV",
+      "decision_point": 1,
+      "kind": "advance",
+      "direction": "left",
+      "text_zh": "前方路口，左轉",
+      "landmark_zh": "入口",
+      "audio_file": "PRACTICE-P01-ADV.m4a"
+    },
+    {
+      "id": "PRACTICE-P01-EXE",
+      "decision_point": 1,
+      "kind": "execute",
+      "direction": "left",
+      "text_zh": "現在左轉，經過入口",
+      "landmark_zh": "入口",
+      "audio_file": "PRACTICE-P01-EXE.m4a"
+    },
+    {
+      "id": "PRACTICE-P02-ADV",
+      "decision_point": 2,
+      "kind": "advance",
+      "direction": "right",
+      "text_zh": "前方路口，右轉",
+      "landmark_zh": "樹下",
+      "audio_file": "PRACTICE-P02-ADV.m4a"
+    },
+    {
+      "id": "PRACTICE-P02-EXE",
+      "decision_point": 2,
+      "kind": "execute",
+      "direction": "right",
+      "text_zh": "現在右轉，經過樹下",
+      "landmark_zh": "樹下",
+      "audio_file": "PRACTICE-P02-EXE.m4a"
+    },
+    {
+      "id": "PRACTICE-END",
+      "kind": "arrived",
+      "direction": "arrived",
+      "text_zh": "已到達目的地，請停下休息",
+      "audio_file": "PRACTICE-END.m4a"
+    }
+  ]
+}

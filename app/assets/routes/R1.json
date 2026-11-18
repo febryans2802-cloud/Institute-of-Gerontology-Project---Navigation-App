@@ -1,0 +1,137 @@
+{
+  "route_id": "R1",
+  "name": "Route 1 (template)",
+  "template": true,
+  "_comment": "TEMPLATE: replace with the surveyed route. Prompts are played in order by the wizard's NEXT button.",
+  "prompts": [
+    {
+      "id": "R1-P01-ADV",
+      "decision_point": 1,
+      "kind": "advance",
+      "direction": "left",
+      "text_zh": "前方路口，左轉",
+      "landmark_zh": "便利商店",
+      "audio_file": "R1-P01-ADV.m4a"
+    },
+    {
+      "id": "R1-P01-EXE",
+      "decision_point": 1,
+      "kind": "execute",
+      "direction": "left",
+      "text_zh": "現在左轉，經過便利商店",
+      "landmark_zh": "便利商店",
+      "audio_file": "R1-P01-EXE.m4a"
+    },
+    {
+      "id": "R1-P02-ADV",
+      "decision_point": 2,
+      "kind": "advance",
+      "direction": "right",
+      "text_zh": "前方路口，右轉",
+      "landmark_zh": "藥局",
+      "audio_file": "R1-P02-ADV.m4a"
+    },
+    {
+      "id": "R1-P02-EXE",
+      "decision_point": 2,
+      "kind": "execute",
+      "direction": "right",
+      "text_zh": "現在右轉，經過藥局",
+      "landmark_zh": "藥局",
+      "audio_file": "R1-P02-EXE.m4a"
+    },
+    {
+      "id": "R1-P02-REA",
+      "kind": "reassure",
+      "direction": "straight",
+      "text_zh": "請繼續直走",
+      "audio_file": "R1-P02-REA.m4a"
+    },
+    {
+      "id": "R1-P03-ADV",
+      "decision_point": 3,
+      "kind": "advance",
+      "direction": "right",
+      "text_zh": "前方路口，右轉",
+      "landmark_zh": "郵局",
+      "audio_file": "R1-P03-ADV.m4a"
+    },
+    {
+      "id": "R1-P03-EXE",
+      "decision_point": 3,
+      "kind": "execute",
+      "direction": "right",
+      "text_zh": "現在右轉，經過郵局",
+      "landmark_zh": "郵局",
+      "audio_file": "R1-P03-EXE.m4a"
+    },
+    {
+      "id": "R1-P04-ADV",
+      "decision_point": 4,
+      "kind": "advance",
+      "direction": "left",
+      "text_zh": "前方路口，左轉",
+      "landmark_zh": "公園入口",
+      "audio_file": "R1-P04-ADV.m4a"
+    },
+    {
+      "id": "R1-P04-EXE",
+      "decision_point": 4,
+      "kind": "execute",
+      "direction": "left",
+      "text_zh": "現在左轉，經過公園入口",
+      "landmark_zh": "公園入口",
+      "audio_file": "R1-P04-EXE.m4a"
+    },
+    {
+      "id": "R1-P04-REA",
+      "kind": "reassure",
+      "direction": "straight",
+      "text_zh": "請繼續直走",
+      "audio_file": "R1-P04-REA.m4a"
+    },
+    {
+      "id": "R1-P05-ADV",
+      "decision_point": 5,
+      "kind": "advance",
+      "direction": "left",
+      "text_zh": "前方路口，左轉",
+      "landmark_zh": "銀行",
+      "audio_file": "R1-P05-ADV.m4a"
+    },
+    {
+      "id": "R1-P05-EXE",
+      "decision_point": 5,
+      "kind": "execute",
+      "direction": "left",
+      "text_zh": "現在左轉，經過銀行",
+      "landmark_zh": "銀行",
+      "audio_file": "R1-P05-EXE.m4a"
+    },
+    {
+      "id": "R1-P06-ADV",
+      "decision_point": 6,
+      "kind": "advance",
+      "direction": "right",
+      "text_zh": "前方路口，右轉",
+      "landmark_zh": "早餐店",
+      "audio_file": "R1-P06-ADV.m4a"
+    },
+    {
+      "id": "R1-P06-EXE",
+      "decision_point": 6,
+      "kind": "execute",
+      "direction": "right",
+      "text_zh": "現在右轉，經過早餐店",
+      "landmark_zh": "早餐店",
+      "audio_file": "R1-P06-EXE.m4a"
+    },
+    {
+      "id": "R1-END",
+      "kind": "arrived",
+      "direction": "arrived",
+      "text_zh": "已到達目的地，請停下休息",
+      "audio_file": "R1-END.m4a"
+    }
+  ]
+}
