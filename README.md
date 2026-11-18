@@ -6,6 +6,7 @@ The study uses a **Wizard-of-Oz** setup: a researcher triggers prompts from a se
 
 - Study & system design: [`docs/study-design.md`](docs/study-design.md)
 - App (Flutter, Android + iOS): [`app/`](app/README.md)
+- Web demo (presentation only, not for data collection): [`demo/index.html`](demo/index.html). Open it in a browser; no build needed.
 
 ## Status
 - Design: draft v0.2. One item is still open: the MoCA-T cutoff.
