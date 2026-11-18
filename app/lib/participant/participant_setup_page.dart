@@ -111,6 +111,17 @@ class _ParticipantSetupPageState extends State<ParticipantSetupPage> {
               hintText: 'e.g. 192.168.43.1',
             ),
           ),
+          Wrap(spacing: 8, children: [
+            ActionChip(
+              label: const Text('Wizard is an iPhone: 172.20.10.1'),
+              onPressed: () => setState(() => _ipCtrl.text = iPhoneHotspotHost),
+            ),
+          ]),
+          const Text(
+            'Automatic search does not work on iPhones (Apple blocks Wi-Fi '
+            'broadcast). Type the IP shown on the wizard screen.',
+            style: TextStyle(fontSize: 12, color: Colors.black54),
+          ),
           const SizedBox(height: 12),
           FilledButton(
             onPressed: () => _connect(_ipCtrl.text, wizardWsPort),

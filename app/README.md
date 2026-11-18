@@ -1,4 +1,4 @@
-# Cane Nav Study app (Flutter, Android)
+# Cane Nav Study app (Flutter, Android + iOS)
 
 One app with two roles, installed on two phones:
 
@@ -11,7 +11,7 @@ The design rationale is in [`../docs/study-design.md`](../docs/study-design.md).
 
 ## Build and install
 
-Requirements: Flutter **3.50+** (stable) and the Android SDK (via Android Studio).
+Requirements: Flutter **3.50+** (stable) and the Android SDK (via Android Studio). For iOS, see the iPhone section below.
 
 ```bash
 cd app
@@ -23,6 +23,63 @@ flutter build apk --release  # → build/app/outputs/flutter-apk/app-release.apk
 Install the same APK on both phones (`adb install -r app-release.apk`).
 The release build uses the debug signing key. That is fine for a research
 prototype that is not distributed through a store.
+
+## iPhone (iOS) build
+
+iOS builds **require a Mac with Xcode**. They cannot be built on Windows or Linux.
+
+```bash
+cd app
+flutter pub get
+open ios/Runner.xcworkspace   # Xcode: Runner → Signing & Capabilities → choose your Team
+flutter run --release         # with the iPhone plugged in and trusted
+```
+
+On the iPhone, enable **Settings → Privacy & Security → Developer Mode** and
+trust the developer certificate under **Settings → General → VPN & Device Management**.
+
+**Signing: choose before the study starts.**
+| Apple account | App lifetime on the phone | Fits a months-long study? |
+|---|---|---|
+| Free Apple ID | **Expires after 7 days**, max 3 devices; must reinstall from the Mac | Only for piloting |
+| Paid Apple Developer Program (individual or university) | 1 year (ad-hoc) or 90 days per TestFlight build | Yes |
+
+Ask the university IT office whether it already has an Apple Developer
+Program membership you can use.
+
+### iPhone limitations that affect the field protocol
+- **Screen must stay on.** iOS suspends an app within seconds after the screen
+  locks or the app goes to the background: no prompts, no GPS. The app keeps
+  the screen awake, but pressing the side button will suspend it. Put the
+  participant iPhone in the pouch with the side button protected. Every
+  background/foreground switch is logged as `app_lifecycle`, and the wizard's
+  NOT RECEIVED banner fires if prompts stop arriving.
+- **Automatic discovery does not work.** Apple blocks Wi-Fi broadcast for
+  apps without a special entitlement. Type the IP instead. If the **wizard** is an
+  iPhone, its hotspot address is always `172.20.10.1` (one-tap chip on the
+  participant setup screen).
+- **First launch asks for "Local Network" permission.** Tap Allow on **both**
+  phones, or they cannot connect. If it was denied, enable it under
+  Settings → Privacy & Security → Local Network.
+- **Wizard iPhone hotspot** needs a SIM with a data plan that allows Personal
+  Hotspot. Keep **Settings → Personal Hotspot** open until the participant phone
+  has joined.
+- **Silent switch:** prompts play even when the iPhone's ring/silent switch is on
+  silent (the app uses the iOS "playback" audio category). Still check this on
+  your phone and headset during piloting.
+- **Haptics** use Core Haptics (iPhone 8 or newer). The patterns are the same as
+  on Android, but they *feel* different: see the next section.
+- **Logs:** Files app → On My iPhone → Cane Nav Study → `logs`, or Finder on a
+  Mac, or the in-app Share button.
+
+### Mixing Android and iPhone in one study
+The two platforms can talk to each other (e.g. an Android wizard with an iPhone
+participant). **Do not change the participant phone model between participants,
+though.** Vibration motors, speaker loudness and TTS voices differ between
+models, so a mixed set of participant phones adds an uncontrolled difference
+to the AH condition. Use **one study-owned participant phone model** for all
+participants. The wizard phone can be anything. Each log records its platform
+and OS version (`participant_hello`, `session_start`) so you can check this afterwards.
 
 ## Field setup (each session)
 

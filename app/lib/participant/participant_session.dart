@@ -250,6 +250,11 @@ class ParticipantSession extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// App moved to background/foreground. On iOS a backgrounded app is
+  /// suspended within seconds (no prompts, no GPS), so this must be visible
+  /// in the data.
+  void logLifecycle(String state) => logger?.log('app_lifecycle', {'state': state});
+
   /// Completes when all queued messages have been handled (for tests).
   Future<void> get idle => _queue;
 

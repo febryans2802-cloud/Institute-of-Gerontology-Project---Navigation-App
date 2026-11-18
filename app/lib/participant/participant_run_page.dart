@@ -30,6 +30,7 @@ class _ParticipantRunPageState extends State<ParticipantRunPage> {
   late final ParticipantSession _session;
   final _location = DeviceLocationSource();
   bool? _locationOk;
+  late final AppLifecycleListener _lifecycle;
 
   @override
   void initState() {
@@ -44,6 +45,8 @@ class _ParticipantRunPageState extends State<ParticipantRunPage> {
     );
     _session.addListener(_onChange);
     _session.start();
+    _lifecycle = AppLifecycleListener(
+        onStateChange: (st) => _session.logLifecycle(st.name));
     _client.connect(widget.host, port: widget.port);
     unawaited(WakelockPlus.enable());
     unawaited(_location.ensurePermission().then((ok) {
@@ -57,6 +60,7 @@ class _ParticipantRunPageState extends State<ParticipantRunPage> {
 
   @override
   void dispose() {
+    _lifecycle.dispose();
     _session.removeListener(_onChange);
     unawaited(_session.stop().then((_) => _client.disconnect()));
     unawaited(WakelockPlus.disable());

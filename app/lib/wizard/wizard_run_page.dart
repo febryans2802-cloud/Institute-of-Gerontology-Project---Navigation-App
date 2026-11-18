@@ -21,12 +21,15 @@ class WizardRunPage extends StatefulWidget {
 
 class _WizardRunPageState extends State<WizardRunPage> {
   WizardSession get s => widget.session;
+  late final AppLifecycleListener _lifecycle;
 
   @override
   void initState() {
     super.initState();
     s.addListener(_onChange);
     s.server.addListener(_onChange);
+    _lifecycle =
+        AppLifecycleListener(onStateChange: (st) => s.logLifecycle(st.name));
     unawaited(WakelockPlus.enable());
   }
 
@@ -36,6 +39,7 @@ class _WizardRunPageState extends State<WizardRunPage> {
 
   @override
   void dispose() {
+    _lifecycle.dispose();
     s.removeListener(_onChange);
     s.server.removeListener(_onChange);
     unawaited(WakelockPlus.disable());

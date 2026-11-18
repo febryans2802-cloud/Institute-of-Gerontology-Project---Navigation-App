@@ -60,7 +60,10 @@ class ParticipantClient extends ChangeNotifier {
         onError: (_) => _onGone(ws),
         cancelOnError: true,
       );
-      send(MsgType.hello, {'platform': Platform.operatingSystem});
+      send(MsgType.hello, {
+        'platform': Platform.operatingSystem,
+        'os_version': Platform.operatingSystemVersion,
+      });
       onConnected?.call();
       notifyListeners();
     } catch (_) {

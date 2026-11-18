@@ -296,6 +296,7 @@ Logs are stored locally and exported over USB/share sheet after the session. Use
 | 8 | IMU | Second Android phone in a lower-back belt pouch running an off-the-shelf sensor-logger app. Switch to a dedicated IMU only if piloting shows phone sampling is irregular | 7.1 |
 | 9 | Haptics device | Phone, not smartwatch (smartwatch → future work) | 2.2 |
 | 10 | Prompt triggering | Wizard-of-Oz | 7.1 |
+| 11 | Platforms | Android and iOS supported. **A single study-owned participant phone model for all participants**, because haptic and audio output differ between models. The wizard phone can be any model | 7.1 |
 
 ### Delivery confirmation (added in v0.2)
 A successful network write does not prove that a prompt arrived; a half-closed connection accepts writes silently. The participant phone acknowledges every prompt (`received`, `rendered`, `finished`). If `received` does not arrive within 1.5 s, the wizard screen shows **NOT RECEIVED — press REPEAT** and logs `prompt_unacked`. In the logs, `transmitted` means "written to the socket". Only acks count as delivery.

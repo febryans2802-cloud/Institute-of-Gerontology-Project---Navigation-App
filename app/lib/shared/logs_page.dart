@@ -69,7 +69,8 @@ class _LogsPageState extends State<LogsPage> {
             padding: const EdgeInsets.all(12),
             child: Text(
               'Folder: ${_dir?.path ?? '…'}\n'
-              'Copy over USB, or share. Logs are never deleted by the app.',
+              '${Platform.isIOS ? 'iPhone: Files app → On My iPhone → Cane Nav Study → logs, or Finder on a Mac.' : 'Android: copy over USB from Android/data/org.navstudy.cane_nav/files/logs.'}\n'
+              'Or use Share. Logs are never deleted by the app.',
               style: Theme.of(context).textTheme.bodySmall,
             ),
           ),

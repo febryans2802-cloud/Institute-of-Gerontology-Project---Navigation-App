@@ -7,6 +7,9 @@ const int wizardWsPort = 8765;
 const int discoveryUdpPort = 8766;
 const String discoveryMagic = 'CANE_NAV_WIZARD';
 
+/// An iPhone's Personal Hotspot always gives itself this address.
+const String iPhoneHotspotHost = '172.20.10.1';
+
 abstract final class MsgType {
   // participant → wizard
   static const hello = 'hello';

@@ -5,8 +5,8 @@ Research prototype (Institute of Gerontology) comparing **screen-based** and **a
 The study uses a **Wizard-of-Oz** setup: a researcher triggers prompts from a second phone, so the experiment tests the guidance modality rather than GPS accuracy.
 
 - Study & system design: [`docs/study-design.md`](docs/study-design.md)
-- App (Flutter, Android): [`app/`](app/README.md)
+- App (Flutter, Android + iOS): [`app/`](app/README.md)
 
 ## Status
 - Design: draft v0.2. One item is still open: the MoCA-T cutoff.
-- App: wizard and participant roles, prompt delivery with acks, and logging are implemented and pass unit and loopback end-to-end tests. **Not yet tested on real phones.** The routes are templates and the prompt audio has not been recorded.
+- App: wizard and participant roles, prompt delivery with acks, and logging are implemented and pass unit and loopback end-to-end tests. **Not yet built or tested on real phones** (Android or iPhone). The routes are templates and the prompt audio has not been recorded.

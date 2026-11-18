@@ -3,6 +3,7 @@
 library;
 
 import 'dart:async';
+import 'dart:io' show Platform;
 
 import 'package:flutter/foundation.dart';
 
@@ -101,6 +102,8 @@ class WizardSession extends ChangeNotifier {
       'participant_id': participantId,
       'sequence': sequence.name,
       'blocks': [for (final b in sequence.blocks) b.toString()],
+      'wizard_platform': Platform.operatingSystem,
+      'wizard_os_version': Platform.operatingSystemVersion,
     });
     _sendSessionState();
   }
@@ -353,6 +356,10 @@ class WizardSession extends ChangeNotifier {
   }
 
   bool get canUndo => _undoStack.isNotEmpty;
+
+  void logLifecycle(String state) {
+    if (!ended) logger.log('app_lifecycle', {'state': state});
+  }
 
   // ---- End ----
 

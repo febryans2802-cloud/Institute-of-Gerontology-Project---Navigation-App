@@ -3,6 +3,7 @@
 library;
 
 import 'dart:async';
+import 'dart:io' show Platform;
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/services.dart';
@@ -28,6 +29,30 @@ class DeviceGuidanceOutput implements GuidanceOutput {
   final _tts = FlutterTts();
   bool? _amplitude;
   bool _ttsReady = false;
+  bool _audioReady = false;
+
+  /// Prompts must play even when the iPhone ring/silent switch is on silent,
+  /// and must route to the Bluetooth bone-conduction headset. On Android
+  /// these are the defaults; on iOS they require the "playback" category.
+  Future<void> _ensureAudioSession() async {
+    if (_audioReady) return;
+    _audioReady = true;
+    await AudioPlayer.global.setAudioContext(AudioContextConfig(
+      respectSilence: false,
+      focus: AudioContextConfigFocus.duckOthers,
+    ).build());
+    if (Platform.isIOS) {
+      await _tts.setSharedInstance(true);
+      await _tts.setIosAudioCategory(
+        IosTextToSpeechAudioCategory.playback,
+        [
+          IosTextToSpeechAudioCategoryOptions.allowBluetoothA2DP,
+          IosTextToSpeechAudioCategoryOptions.duckOthers,
+        ],
+        IosTextToSpeechAudioMode.spokenAudio,
+      );
+    }
+  }
 
   @override
   Future<void> vibrate(VibrationPattern p) async {
@@ -50,6 +75,7 @@ class DeviceGuidanceOutput implements GuidanceOutput {
 
   @override
   Future<String> speak(RoutePrompt p) async {
+    await _ensureAudioSession();
     final file = p.audioFile;
     if (file != null && await _assetExists('assets/audio/$file')) {
       final done = _player.onPlayerComplete.first;
@@ -104,13 +130,19 @@ class DeviceLocationSource implements LocationSource {
   @override
   void start(void Function(GpsFix fix) onFix) {
     stop();
-    _sub = Geolocator.getPositionStream(
-      locationSettings: AndroidSettings(
-        accuracy: LocationAccuracy.best,
-        distanceFilter: 0,
-        intervalDuration: const Duration(seconds: 1),
-      ),
-    ).listen(
+    final LocationSettings settings = Platform.isIOS
+        ? AppleSettings(
+            accuracy: LocationAccuracy.bestForNavigation,
+            activityType: ActivityType.fitness,
+            distanceFilter: 0,
+            pauseLocationUpdatesAutomatically: false,
+          )
+        : AndroidSettings(
+            accuracy: LocationAccuracy.best,
+            distanceFilter: 0,
+            intervalDuration: const Duration(seconds: 1),
+          );
+    _sub = Geolocator.getPositionStream(locationSettings: settings).listen(
       (p) => onFix(GpsFix({
         'lat': p.latitude,
         'lon': p.longitude,
