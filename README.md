@@ -5,6 +5,7 @@ Research prototype (Institute of Gerontology) comparing **screen-based** and **a
 The study uses a **Wizard-of-Oz** setup: a researcher triggers prompts from a second phone, so the experiment tests the guidance modality rather than GPS accuracy.
 
 - Study & system design: [`docs/study-design.md`](docs/study-design.md)
+- UI flow (both phones, messages, failure paths): [`docs/ui-flow.html`](docs/ui-flow.html)
 - App (Flutter, Android + iOS): [`app/`](app/README.md)
 - Web demo (presentation only, not for data collection): [`demo/index.html`](demo/index.html). Open it in a browser; no build needed.
 

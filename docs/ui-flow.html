@@ -1,0 +1,479 @@
+<title>Cane Nav UI Flow</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=Noto+Sans+TC:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one swimlane diagram (two phones, messages between them), then screen-by-screen wireframes per phone, then failure paths and gaps. */
+:root {
+  --bg: #eef1f2;
+  --surface: #ffffff;
+  --ink: #18201f;
+  --muted: #5b6766;
+  --line: #d3dad9;
+  --accent: #0e6b62;
+  --accent-soft: #d7ebe8;
+  --ack: #b36b00;
+  --danger: #b3261e;
+  --danger-soft: #f7dedc;
+  --lane-w: #e3ecea;
+  --lane-p: #ece8df;
+  --screen: #fbfcfc;
+  --screen-ink: #1b1f1e;
+  --font-display: "Archivo", "Noto Sans TC", system-ui, sans-serif;
+  --font-body: "Noto Sans TC", system-ui, -apple-system, "PingFang TC", "Microsoft JhengHei", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111615; --surface: #1a2120; --ink: #e6eceb; --muted: #9aa8a6; --line: #2f3a38;
+    --accent: #45b8aa; --accent-soft: #193834; --ack: #f0a92a; --danger: #f2817a; --danger-soft: #3a1f1d;
+    --lane-w: #18302d; --lane-p: #2b2820; --screen: #f2f4f4; --screen-ink: #151918;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111615; --surface: #1a2120; --ink: #e6eceb; --muted: #9aa8a6; --line: #2f3a38;
+  --accent: #45b8aa; --accent-soft: #193834; --ack: #f0a92a; --danger: #f2817a; --danger-soft: #3a1f1d;
+  --lane-w: #18302d; --lane-p: #2b2820; --screen: #f2f4f4; --screen-ink: #151918;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 24px 40px;
+}
+.wrap { max-width: 1180px; margin: 0 auto; display: grid; gap: 28px; }
+h1 { font-family: var(--font-display); font-weight: 800; font-size: clamp(1.6rem, 3.2vw, 2.2rem); margin: 0; letter-spacing: -0.01em; text-wrap: balance; }
+h2 { font-family: var(--font-display); font-size: 1.25rem; margin: 0; text-wrap: balance; }
+h3 { font-family: var(--font-display); font-size: 1rem; margin: 0; }
+p { margin: 0; max-width: 72ch; }
+.muted { color: var(--muted); }
+code, .mono { font-family: var(--font-mono); font-size: 0.86em; }
+section { display: grid; gap: 14px; }
+.eyebrow { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+
+figure { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: grid; gap: 10px; }
+.scroll { overflow-x: auto; }
+figure svg { display: block; width: 100%; min-width: 860px; height: auto; color: var(--ink); }
+figcaption { font-size: 13px; color: var(--muted); max-width: 90ch; }
+
+/* Wireframes */
+.lane-title { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.lane-title .chip { font-size: 12px; padding: 2px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-weight: 700; }
+.screens { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.card .id { font-family: var(--font-mono); font-size: 12px; color: var(--accent); }
+.flowmeta { font-size: 13px; display: grid; gap: 4px; }
+.flowmeta div { display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 6px; }
+.flowmeta b { font-weight: 500; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; padding-top: 1px; }
+
+.phone { width: 100%; max-width: 200px; aspect-ratio: 9 / 16; justify-self: center; border: 2px solid var(--ink); border-radius: 20px; padding: 8px; background: var(--surface); }
+.scr { height: 100%; border-radius: 12px; background: var(--screen); color: var(--screen-ink); overflow: hidden; display: flex; flex-direction: column; font-size: 10px; line-height: 1.3; }
+.scr.black { background: #000; color: #8d8d8d; }
+.bar { background: #dfe7e6; color: #1b1f1e; padding: 5px 7px; font-weight: 700; font-size: 10px; }
+.bar.ok { background: #cfe9d6; color: #14532d; }
+.bar.bad { background: #f4cfcc; color: #7f1d1d; }
+.pad { padding: 7px; display: flex; flex-direction: column; gap: 5px; flex: 1; min-height: 0; }
+.w-btn { border: 1px solid #9aa3a2; border-radius: 5px; padding: 4px 5px; text-align: center; font-size: 9px; background: #fff; color: #1b1f1e; }
+.w-btn.fill { background: #0e6b62; border-color: #0e6b62; color: #fff; font-weight: 700; }
+.w-btn.big { flex: 1; display: flex; flex-direction: column; justify-content: center; font-size: 10px; }
+.w-btn.big strong { font-size: 15px; letter-spacing: 0.05em; }
+.w-btn.red { color: #b3261e; }
+.w-in { border-bottom: 1px solid #9aa3a2; padding: 3px 0; color: #6b7473; font-size: 9px; }
+.w-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; }
+.w-row2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 3px; }
+.w-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; }
+.w-grid .w-btn { font-size: 8px; padding: 4px 2px; }
+.w-note { background: #fff4d6; color: #5a4300; border-radius: 4px; padding: 3px 5px; font-size: 8.5px; }
+.w-alert { background: #b3261e; color: #fff; border-radius: 4px; padding: 3px 5px; font-size: 9px; font-weight: 700; }
+.center { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 4px; padding: 8px; }
+.huge { font-size: 17px; font-weight: 700; }
+.dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+.corner { padding: 6px 7px 0; display: flex; gap: 4px; align-items: center; font-size: 8px; color: #8d8d8d; }
+.arrowico { width: 54%; color: #111; }
+
+/* Tables */
+.tablewrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
+table { border-collapse: collapse; width: 100%; min-width: 760px; font-size: 14px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+th { font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); font-weight: 500; }
+tr:last-child td { border-bottom: 0; }
+.tag { display: inline-block; font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 999px; white-space: nowrap; }
+.tag.ok { background: var(--accent-soft); color: var(--accent); }
+.tag.gap { background: var(--danger-soft); color: var(--danger); }
+
+.gaps { display: grid; gap: 12px; }
+.gap { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--danger); border-radius: 10px; padding: 12px 14px; display: grid; gap: 6px; }
+.gap p { font-size: 14px; }
+footer { font-size: 12px; color: var(--muted); }
+</style>
+
+<div class="wrap">
+  <header style="display:grid;gap:8px">
+    <div class="eyebrow">Wizard-of-Oz study app · Android + iOS</div>
+    <h1>Cane Nav UI Flow</h1>
+    <p class="muted">How a session moves through the two phones. The researcher phone drives every change on the participant phone; the participant never taps anything during a walk. Drawn from the screens and messages implemented in <code>app/lib</code>, not from a plan.</p>
+  </header>
+
+  <!-- ============ 1. Swimlane ============ -->
+  <section aria-labelledby="s1">
+    <h2 id="s1">Session flow across both phones</h2>
+    <figure>
+      <div class="scroll">
+      <svg viewBox="0 0 1100 470" role="img" aria-label="Swimlane: the researcher phone moves from Home to Setup to the block picker and block controls, then ends the session; each step sends a message that switches the participant phone between Waiting, Guiding and Finished, and the participant phone acknowledges every prompt.">
+        <defs>
+          <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker>
+          <marker id="ahm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--accent)"/></marker>
+          <marker id="aha" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--ack)"/></marker>
+        </defs>
+
+        <!-- lanes -->
+        <rect x="0" y="40" width="1100" height="150" rx="10" style="fill:var(--lane-w)"/>
+        <rect x="0" y="262" width="1100" height="150" rx="10" style="fill:var(--lane-p)"/>
+        <text x="12" y="60" font-size="12" font-weight="700" fill="currentColor" style="font-family:var(--font-display)">RESEARCHER PHONE</text>
+        <text x="12" y="282" font-size="12" font-weight="700" fill="currentColor" style="font-family:var(--font-display)">PARTICIPANT PHONE</text>
+
+        <!-- researcher nodes (center y 115) -->
+        <g font-size="12" text-anchor="middle" fill="currentColor" style="font-family:var(--font-body)">
+          <rect x="15" y="90" width="120" height="50" rx="8" style="fill:var(--surface);stroke:currentColor"/>
+          <text x="75" y="112" font-weight="700">Home</text><text x="75" y="128" font-size="11" style="fill:var(--muted)">pick “Wizard”</text>
+
+          <rect x="195" y="90" width="120" height="50" rx="8" style="fill:var(--surface);stroke:currentColor"/>
+          <text x="255" y="112" font-weight="700">Setup</text><text x="255" y="128" font-size="11" style="fill:var(--muted)">code · sequence</text>
+
+          <rect x="395" y="90" width="120" height="50" rx="8" style="fill:var(--surface);stroke:currentColor"/>
+          <text x="455" y="112" font-weight="700">Block picker</text><text x="455" y="128" font-size="11" style="fill:var(--muted)">practice / block 1·2</text>
+
+          <rect x="620" y="90" width="120" height="50" rx="8" style="fill:var(--surface);stroke:currentColor;stroke-width:2"/>
+          <text x="680" y="112" font-weight="700">Block controls</text><text x="680" y="128" font-size="11" style="fill:var(--muted)">NEXT · observe</text>
+
+          <rect x="890" y="90" width="120" height="50" rx="8" style="fill:var(--surface);stroke:currentColor"/>
+          <text x="950" y="112" font-weight="700">Session ended</text><text x="950" y="128" font-size="11" style="fill:var(--muted)">logs closed</text>
+        </g>
+
+        <!-- participant nodes (center y 337) -->
+        <g font-size="12" text-anchor="middle" fill="currentColor" style="font-family:var(--font-body)">
+          <rect x="15" y="312" width="120" height="50" rx="8" style="fill:var(--surface);stroke:currentColor"/>
+          <text x="75" y="334" font-weight="700">Home</text><text x="75" y="350" font-size="11" style="fill:var(--muted)">pick “Participant”</text>
+
+          <rect x="195" y="312" width="120" height="50" rx="8" style="fill:var(--surface);stroke:currentColor"/>
+          <text x="255" y="334" font-weight="700">Setup</text><text x="255" y="350" font-size="11" style="fill:var(--muted)">find / type IP</text>
+
+          <rect x="395" y="312" width="120" height="50" rx="8" style="fill:var(--surface);stroke:currentColor"/>
+          <text x="455" y="334" font-weight="700">Waiting 請稍候</text><text x="455" y="350" font-size="11" style="fill:var(--muted)">connecting → ready</text>
+
+          <rect x="620" y="312" width="120" height="50" rx="8" style="fill:var(--surface);stroke:currentColor;stroke-width:2"/>
+          <text x="680" y="334" font-weight="700">Guiding</text><text x="680" y="350" font-size="11" style="fill:var(--muted)">Screen or AH</text>
+
+          <rect x="890" y="312" width="120" height="50" rx="8" style="fill:var(--surface);stroke:currentColor"/>
+          <text x="950" y="334" font-weight="700">Finished 完成</text><text x="950" y="350" font-size="11" style="fill:var(--muted)">thank-you screen</text>
+        </g>
+
+        <!-- in-lane transitions: researcher -->
+        <g fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah)">
+          <line x1="135" y1="115" x2="193" y2="115"/>
+          <line x1="315" y1="115" x2="393" y2="115"/>
+          <line x1="515" y1="108" x2="618" y2="108"/>
+          <line x1="740" y1="115" x2="888" y2="115"/>
+          <path d="M 680 90 C 680 62, 455 62, 455 88"/>
+          <path d="M 950 90 C 950 26, 255 26, 255 88"/>
+        </g>
+        <g font-size="11" text-anchor="middle" fill="currentColor" style="font-family:var(--font-body)">
+          <text x="355" y="108">Start session</text>
+          <text x="567" y="101">Start block</text>
+          <text x="567" y="70">End block (back to picker)</text>
+          <text x="815" y="108">End session</text>
+          <text x="600" y="22">Next participant (code cleared, enrolment +1)</text>
+        </g>
+
+        <!-- in-lane transitions: participant -->
+        <g fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah)">
+          <line x1="135" y1="337" x2="193" y2="337"/>
+          <line x1="315" y1="337" x2="393" y2="337"/>
+          <line x1="515" y1="330" x2="618" y2="330"/>
+          <line x1="740" y1="337" x2="888" y2="337"/>
+          <path d="M 680 362 C 680 392, 455 392, 455 364"/>
+          <path d="M 950 362 C 950 452, 455 452, 455 364"/>
+        </g>
+        <g font-size="11" text-anchor="middle" fill="currentColor" style="font-family:var(--font-body)">
+          <text x="355" y="330">Connect</text>
+          <text x="567" y="397">on condition_end</text>
+          <text x="740" y="460">on next session message</text>
+        </g>
+
+        <!-- messages: researcher -> participant -->
+        <g fill="none" stroke-width="2" style="stroke:var(--accent)" marker-end="url(#ahm)">
+          <line x1="455" y1="140" x2="455" y2="310"/>
+          <line x1="660" y1="140" x2="660" y2="310"/>
+          <line x1="950" y1="140" x2="950" y2="310"/>
+        </g>
+        <!-- acks: participant -> researcher -->
+        <g fill="none" stroke-width="2" stroke-dasharray="5 4" style="stroke:var(--ack)" marker-end="url(#aha)">
+          <line x1="705" y1="312" x2="705" y2="142"/>
+        </g>
+        <g font-size="11" style="font-family:var(--font-mono)">
+          <text x="462" y="210" style="fill:var(--accent)">session</text>
+          <text x="462" y="224" font-size="10" style="fill:var(--muted);font-family:var(--font-body)">also re-sent on reconnect</text>
+          <text x="652" y="196" text-anchor="end" style="fill:var(--accent)">condition_start</text>
+          <text x="652" y="210" text-anchor="end" style="fill:var(--accent)">prompt</text>
+          <text x="652" y="224" text-anchor="end" style="fill:var(--accent)">sync_marker</text>
+          <text x="712" y="196" style="fill:var(--ack)">ack: received</text>
+          <text x="712" y="210" style="fill:var(--ack)">rendered · finished</text>
+          <text x="712" y="224" font-size="10" style="fill:var(--muted);font-family:var(--font-body)">none in 1.5 s → NOT RECEIVED</text>
+          <text x="957" y="224" style="fill:var(--accent)">session_end</text>
+        </g>
+        <!-- ping strip -->
+        <text x="12" y="180" font-size="10" style="fill:var(--muted);font-family:var(--font-body)">ping/pong every 1 s keeps the link status and clock offset</text>
+      </svg>
+      </div>
+      <figcaption>Solid teal arrows are messages the researcher phone sends; the dashed amber arrow is the participant phone confirming each prompt. A study session loops through the block picker and block controls once per practice walk and twice for the study blocks before “End session”.</figcaption>
+    </figure>
+  </section>
+
+  <!-- ============ 2. Researcher screens ============ -->
+  <section aria-labelledby="s2">
+    <div class="lane-title"><h2 id="s2">Researcher phone screens</h2><span class="chip">研究人員</span></div>
+    <div class="screens">
+
+      <div class="card">
+        <span class="id">W1 · wizard_setup_page.dart</span>
+        <h3>Setup</h3>
+        <div class="phone"><div class="scr">
+          <div class="bar">研究人員 Wizard setup</div>
+          <div class="pad">
+            <div class="w-note" style="background:#e8eeee;color:#1b1f1e">Turn ON hotspot · IP 192.168.43.1 : 8765</div>
+            <div class="bar ok" style="border-radius:4px">● Participant connected · RTT 24ms</div>
+            <div class="w-note">⚠ R1, R2 are TEMPLATES</div>
+            <div class="w-in">Participant code: P07</div>
+            <div class="w-in">Enrolment number: 7</div>
+            <div style="font-size:9px">◉ C: S on R2 → AH on R1</div>
+            <div style="font-size:9px;color:#6b7473">○ A ○ B ○ D</div>
+            <div class="w-btn fill" style="margin-top:auto">▶ Start session</div>
+          </div>
+        </div></div>
+        <div class="flowmeta">
+          <div><b>From</b><span>Home → Wizard. Server and discovery beacon start here.</span></div>
+          <div><b>Does</b><span>Shows IP and link status; enrolment number suggests the A–D sequence.</span></div>
+          <div><b>To</b><span>W2 when a participant code is entered and routes are loaded.</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <span class="id">W2 · wizard_run_page.dart</span>
+        <h3>Block picker</h3>
+        <div class="phone"><div class="scr">
+          <div class="bar">P07 · Seq C</div>
+          <div class="bar ok">● CONNECTED · RTT 24ms · offset −37ms</div>
+          <div class="pad">
+            <div style="font-size:9px;font-weight:700">Practice</div>
+            <div class="w-row2"><div class="w-btn">Practice S</div><div class="w-btn">Practice AH</div></div>
+            <div style="font-size:9px;font-weight:700;margin-top:4px">Study blocks</div>
+            <div class="w-btn fill" style="background:#8a9594;border-color:#8a9594">Block 1: Screen on R2 ✓</div>
+            <div class="w-btn fill">Block 2: Audio + Haptic on R1</div>
+            <div class="w-btn" style="margin-top:auto">⚡ Sync marker</div>
+          </div>
+        </div></div>
+        <div class="flowmeta">
+          <div><b>From</b><span>W1 Start session, or W3 End block.</span></div>
+          <div><b>Does</b><span>Completed blocks turn grey with ✓; repeating one asks for confirmation.</span></div>
+          <div><b>To</b><span>W3 (sends <code>condition_start</code>). Back or ⏹ asks “End session?”</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <span class="id">W3 · wizard_run_page.dart</span>
+        <h3>Block controls</h3>
+        <div class="phone"><div class="scr">
+          <div class="bar ok">● CONNECTED · latency 92ms</div>
+          <div class="pad">
+            <div style="font-size:9px;font-weight:700">Audio + Haptic · R1 (3/15 sent)</div>
+            <div class="w-alert">NOT RECEIVED: R1-P02-ADV — press REPEAT</div>
+            <div class="w-btn fill big"><strong>NEXT</strong><span style="font-size:8px">R1-P02-EXE · execute</span><span>現在右轉，經過藥局</span></div>
+            <div class="w-row"><div class="w-btn">REPEAT</div><div class="w-btn red">OFF-ROUTE</div><div class="w-btn">SYNC</div></div>
+            <div class="w-grid">
+              <div class="w-btn">停下</div><div class="w-btn">走錯</div><div class="w-btn">求助</div>
+              <div class="w-btn">介入</div><div class="w-btn">險跌</div><div class="w-btn">等燈</div>
+              <div class="w-btn">筆記</div><div class="w-btn">復原</div><div class="w-btn" style="visibility:hidden">.</div>
+            </div>
+            <div class="w-btn">End block</div>
+          </div>
+        </div></div>
+        <div class="flowmeta">
+          <div><b>From</b><span>W2 Start block.</span></div>
+          <div><b>Does</b><span>NEXT sends the scripted prompt; buttons log observer events; red banner if a prompt is not confirmed within 1.5 s.</span></div>
+          <div><b>To</b><span>W2 via End block (confirm if prompts remain; logged as aborted).</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 3. Participant screens ============ -->
+  <section aria-labelledby="s3">
+    <div class="lane-title"><h2 id="s3">Participant phone screens</h2><span class="chip">受試者</span></div>
+    <p class="muted" style="font-size:14px">After P1 the participant phone has no buttons. Every change below is caused by a message from the researcher phone. To leave, long-press the status dot in the top-left corner and confirm.</p>
+    <div class="screens">
+
+      <div class="card">
+        <span class="id">P1 · participant_setup_page.dart</span>
+        <h3>Setup</h3>
+        <div class="phone"><div class="scr">
+          <div class="bar">受試者 Participant setup</div>
+          <div class="pad">
+            <div style="font-size:9px">1. Join wizard hotspot · 2. Pick wizard · 3. Pair headset</div>
+            <div style="font-size:9px;font-weight:700">Wizards found</div>
+            <div class="w-btn" style="text-align:left">📶 192.168.43.1 · port 8765 →</div>
+            <div style="font-size:9px;font-weight:700;margin-top:4px">Manual</div>
+            <div class="w-in">Wizard IP address</div>
+            <div class="w-btn" style="font-size:8px">Wizard is an iPhone: 172.20.10.1</div>
+            <div class="w-btn fill" style="margin-top:auto">Connect</div>
+          </div>
+        </div></div>
+        <div class="flowmeta">
+          <div><b>From</b><span>Home → Participant.</span></div>
+          <div><b>Does</b><span>Lists wizards found by broadcast (Android only); remembers the last IP.</span></div>
+          <div><b>To</b><span>P2. Keeps retrying every 2 s until connected.</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <span class="id">P2 · participant_run_page.dart</span>
+        <h3>Waiting</h3>
+        <div class="phone"><div class="scr">
+          <div class="corner"><span class="dot" style="background:#2e9e58"></span></div>
+          <div class="center"><div class="huge">請稍候</div><div>Connected. Waiting for the researcher to start.</div></div>
+        </div></div>
+        <div class="flowmeta">
+          <div><b>From</b><span>P1 Connect; <code>condition_end</code>; a new <code>session</code> after P5.</span></div>
+          <div><b>Does</b><span>Shows “連線中…” with a red dot until connected. Opens the log on <code>session</code>.</span></div>
+          <div><b>To</b><span>P3 or P4 on <code>condition_start</code>.</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <span class="id">P3 · condition S</span>
+        <h3>Guiding: Screen</h3>
+        <div class="phone"><div class="scr">
+          <div class="corner"><span class="dot" style="background:#2e9e58"></span>S</div>
+          <div class="center">
+            <svg class="arrowico" viewBox="0 0 100 110" aria-hidden="true"><g transform="translate(100 0) scale(-1 1)"><path d="M66 104 V52 a14 14 0 0 0 -14 -14 H34" fill="none" stroke="currentColor" stroke-width="13" stroke-linecap="round"/><polygon points="38,14 38,62 6,38" fill="currentColor"/></g></svg>
+            <div class="huge">現在右轉，經過藥局</div><div style="font-size:11px">藥局</div>
+          </div>
+        </div></div>
+        <div class="flowmeta">
+          <div><b>From</b><span><code>condition_start</code> with S (first shows “請準備出發”).</span></div>
+          <div><b>Does</b><span>Each <code>prompt</code>: arrow + text + landmark, one short direction-free vibration.</span></div>
+          <div><b>To</b><span>P2 on <code>condition_end</code>; white flash on <code>sync_marker</code>.</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <span class="id">P4 · condition AH</span>
+        <h3>Guiding: Audio + Haptic</h3>
+        <div class="phone"><div class="scr black">
+          <div class="corner"><span class="dot" style="background:#2e9e58"></span>AH</div>
+          <div class="center"><div class="huge" style="color:#8d8d8d">語音導航中</div><div>Audio guidance</div></div>
+        </div></div>
+        <div class="flowmeta">
+          <div><b>From</b><span><code>condition_start</code> with AH.</span></div>
+          <div><b>Does</b><span>Each <code>prompt</code>: direction vibration, then voice. Screen never shows the direction.</span></div>
+          <div><b>To</b><span>P2 on <code>condition_end</code>. A newer prompt cuts off the previous voice.</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <span class="id">P5 · participant_run_page.dart</span>
+        <h3>Finished</h3>
+        <div class="phone"><div class="scr">
+          <div class="corner"><span class="dot" style="background:#2e9e58"></span></div>
+          <div class="center"><div class="huge">完成，謝謝您！</div><div>Session finished</div></div>
+        </div></div>
+        <div class="flowmeta">
+          <div><b>From</b><span><code>session_end</code>. GPS stops, log closes.</span></div>
+          <div><b>To</b><span>P2 automatically when the researcher starts the next session.</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 4. Shared screens ============ -->
+  <section aria-labelledby="s4">
+    <div class="lane-title"><h2 id="s4">Shared screens</h2><span class="chip">both phones</span></div>
+    <div class="screens">
+      <div class="card">
+        <span class="id">H · main.dart</span>
+        <h3>Home</h3>
+        <div class="phone"><div class="scr">
+          <div class="bar">Cane Nav Study</div>
+          <div class="pad">
+            <div class="w-btn" style="text-align:left;padding:8px"><b>研究人員 Wizard</b><br>Researcher phone</div>
+            <div class="w-btn" style="text-align:left;padding:8px"><b>受試者 Participant</b><br>Carried by the participant</div>
+            <div class="w-btn" style="text-align:left;padding:8px"><b>紀錄檔 Logs</b><br>View and export</div>
+          </div>
+        </div></div>
+        <div class="flowmeta">
+          <div><b>To</b><span>W1, P1 or L. The same app is installed on both phones; the role is picked here each time.</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <span class="id">L · logs_page.dart</span>
+        <h3>Logs</h3>
+        <div class="phone"><div class="scr">
+          <div class="bar">Logs ⟳ ⇪</div>
+          <div class="pad">
+            <div style="font-size:8px;color:#6b7473">Folder: …/files/logs · never deleted by the app</div>
+            <div class="w-btn" style="text-align:left">P07_20261203_0914_wizard.jsonl<br><span style="color:#6b7473">48.2 KB</span></div>
+            <div class="w-btn" style="text-align:left">P07_20261203_0914_participant.jsonl<br><span style="color:#6b7473">212.5 KB</span></div>
+            <div class="w-btn" style="text-align:left">P06_20261202_1530_wizard.jsonl<br><span style="color:#6b7473">51.0 KB</span></div>
+          </div>
+        </div></div>
+        <div class="flowmeta">
+          <div><b>Does</b><span>Lists session logs newest first; share one or all. File names here are examples.</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 5. Failure paths ============ -->
+  <section aria-labelledby="s5">
+    <h2 id="s5">When something goes wrong</h2>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Situation</th><th>Researcher sees</th><th>Participant phone</th><th>Recovery</th><th></th></tr></thead>
+        <tbody>
+          <tr><td>Wi-Fi link drops mid-walk</td><td>Status bar turns red: NOT CONNECTED</td><td>Red dot; current screen stays</td><td>Reconnects every 2 s; researcher re-sends session and current block automatically; press REPEAT for any missed prompt</td><td><span class="tag ok">handled</span></td></tr>
+          <tr><td>Prompt sent but not delivered</td><td>Red banner “NOT RECEIVED … press REPEAT” after 1.5 s</td><td>Nothing</td><td>REPEAT; <code>prompt_unacked</code> is logged</td><td><span class="tag ok">handled</span></td></tr>
+          <tr><td>Participant app restarted</td><td>Link red, then green</td><td>Back through P1; continues in the same block</td><td>Same session id, so the log continues; a new file part is opened</td><td><span class="tag ok">handled</span></td></tr>
+          <tr><td>Phone locked or app backgrounded (mainly iPhone)</td><td>Link red; NOT RECEIVED banners</td><td>App suspended: no prompts, no GPS</td><td>Wake the phone; <code>app_lifecycle</code> is logged</td><td><span class="tag ok">handled</span></td></tr>
+          <tr><td>Researcher app restarted</td><td>Back at Home; must start a new session</td><td>Opens a second log with a new session id</td><td>None in the app: completed blocks and session id are lost</td><td><span class="tag gap">gap</span></td></tr>
+          <tr><td>Location permission denied on participant phone</td><td>Nothing</td><td>Orange status dot only</td><td>None: the walk runs with no GPS trace</td><td><span class="tag gap">gap</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ 6. Gaps ============ -->
+  <section aria-labelledby="s6">
+    <h2 id="s6">Gaps found while mapping the flow</h2>
+    <div class="gaps">
+      <div class="gap">
+        <h3>No way to resume a session after the researcher app restarts</h3>
+        <p>The session id is built from the participant code and the current minute, and completed blocks live only in memory. A crash between Block 1 and Block 2 forces a new session, splits the participant's data across two ids, and loses the record of which block was done. <b>Fix:</b> save the session state to disk and offer “Resume P07 session” on the Setup screen.</p>
+      </div>
+      <div class="gap">
+        <h3>The vibration recognition check has no screen</h3>
+        <p>The protocol (§2.2) requires participants to identify ≥ 90% of patterns while walking, but the practice walk only plays prompts. Results would have to go into free-text notes. <b>Fix:</b> a short “pattern check” mode on the researcher phone: play a random pattern, tap what the participant said, log the score.</p>
+      </div>
+      <div class="gap">
+        <h3>Missing GPS is invisible to the researcher</h3>
+        <p>If location permission is denied, only a small orange dot on the participant phone shows it, and that phone is in a pouch. <b>Fix:</b> send the permission state in the hello message and show it in the researcher's status bar before Start block.</p>
+      </div>
+    </div>
+    <p class="muted" style="font-size:14px">Not drawn because they are outside the app: consent, screening, the Borg and NASA-TLX questionnaires, and the IMU and camera setup. They happen on paper or other devices between the screens above.</p>
+  </section>
+
+  <footer>Screen IDs match the source files in <code>app/lib</code>. Example values (P07, IP addresses, latencies, file sizes) are illustrative.</footer>
+</div>
